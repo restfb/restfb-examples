@@ -48,7 +48,6 @@ public class GraphReaderExample extends Example {
    * RestFB Graph API client.
    */
   private final FacebookClient facebookClient23;
-  private final FacebookClient facebookClient20;
 
   /**
    * Entry point. You must provide a single argument on the command line: a valid Graph API access token.
@@ -68,7 +67,6 @@ public class GraphReaderExample extends Example {
 
   GraphReaderExample(String accessToken) {
     facebookClient23 = new DefaultFacebookClient(accessToken, Version.VERSION_2_3);
-    facebookClient20 = new DefaultFacebookClient(accessToken, Version.VERSION_2_0);
   }
 
   void runEverything() {
@@ -77,8 +75,6 @@ public class GraphReaderExample extends Example {
     fetchObjectsAsJsonObject();
     fetchConnections();
     fetchDifferentDataTypesAsJsonObject();
-    query();
-    multiquery();
     search();
     metadata();
     paging();
@@ -141,12 +137,6 @@ public class GraphReaderExample extends Example {
       String firstPhotoUrl = photosConnectionData.getJsonObject(0).getString("source");
       out.println(firstPhotoUrl);
     }
-
-    String query = "SELECT uid, name FROM user WHERE uid=4 or uid=11";
-    List<JsonObject> queryResults = facebookClient20.executeFqlQuery(query, JsonObject.class);
-
-    if (!queryResults.isEmpty())
-      out.println(queryResults.get(0).getString("name"));
   }
 
   /**
@@ -172,84 +162,11 @@ public class GraphReaderExample extends Example {
       out.println("First item in my feed: " + myFeed.getData().get(0).getMessage());
   }
 
-  void query() {
-    out.println("* FQL Query *");
-
-    List<FqlUser> users =
-        facebookClient20.executeFqlQuery("SELECT uid, name FROM user WHERE uid=4 or uid=11", FqlUser.class);
-
-    out.println("User: " + users);
-  }
-
-  void multiquery() {
-    out.println("* FQL Multiquery *");
-
-    Map<String, String> queries = new HashMap<String, String>();
-    queries.put("users", "SELECT uid, name FROM user WHERE uid=4 OR uid=11");
-    queries.put("likers", "SELECT user_id FROM like WHERE object_id=122788341354");
-
-    MultiqueryResults multiqueryResults = facebookClient20.executeFqlMultiquery(queries, MultiqueryResults.class);
-
-    out.println("Users: " + multiqueryResults.users);
-    out.println("People who liked: " + multiqueryResults.likers);
-  }
-
-  /**
-   * Holds results from an "executeQuery" call.
-   * <p>
-   * Be aware that FQL fields don't always map to Graph API Object fields.
-   */
-  public static class FqlUser {
-    @Facebook
-    String uid;
-
-    @Facebook
-    String name;
-
-    @Override
-    public String toString() {
-      return format("%s (%s)", name, uid);
-    }
-  }
-
-  /**
-   * Holds results from an "executeQuery" call.
-   * <p>
-   * Be aware that FQL fields don't always map to Graph API Object fields.
-   */
-  public static class FqlLiker {
-    @Facebook("user_id")
-    String userId;
-
-    @Override
-    public String toString() {
-      return userId;
-    }
-  }
-
-  /**
-   * Holds results from a "multiquery" call.
-   */
-  public static class MultiqueryResults {
-    @Facebook
-    List<FqlUser> users;
-
-    @Facebook
-    List<FqlLiker> likers;
-  }
-
   void search() {
     out.println("* Searching connections *");
 
-    // Connection<Post> publicSearch =
-    // facebookClient23.fetchConnection("search", Post.class, Parameter.with("q", "watermelon"),
-    // Parameter.with("type", "post"));
-
     Connection<User> targetedSearch = facebookClient23.fetchConnection("search", User.class,
       Parameter.with("q", "Mark"), Parameter.with("type", "user"));
-
-    // if (publicSearch.getData().size() > 0)
-    // out.println("Public search: " + publicSearch.getData().get(0).getMessage());
 
     out.println("Posts on my wall by friends named Mark: " + targetedSearch.getData().size());
   }
