@@ -12,6 +12,7 @@ You can run the examples afterwards like this:
 $ mvn exec:java@run-reader-examples -Daccess_token=MY_ACCESS_TOKEN
 $ mvn exec:java@run-publisher-examples -Daccess_token=MY_ACCESS_TOKEN
 $ mvn exec:java@run-legacy-examples -Daccess_token=MY_ACCESS_TOKEN
+$ mvn exec:java@run-login-example -Dapp_id=APP_ID -Dapp_secret=APP_SECRET
 ```
 
 Instructions for getting an OAuth access token are available on [RestFB](http://restfb.com).

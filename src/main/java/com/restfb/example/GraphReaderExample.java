@@ -34,6 +34,7 @@ import com.restfb.types.Page;
 import com.restfb.types.Post;
 import com.restfb.types.Url;
 import com.restfb.types.User;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.util.*;
 
@@ -60,8 +61,10 @@ public class GraphReaderExample extends Example {
   public static void main(String[] args) {
     if (args.length == 0)
       throw new IllegalArgumentException(
-        "You must provide an OAuth access token parameter. " + "See README for more information.");
+        "You must provide an OAuth access token parameter. See README for more information.");
 
+    SLF4JBridgeHandler.removeHandlersForRootLogger();
+    SLF4JBridgeHandler.install();
     new GraphReaderExample(args[0]).runEverything();
   }
 
@@ -128,7 +131,7 @@ public class GraphReaderExample extends Example {
     out.println("* Fetching different types of data as JsonObject *");
 
     JsonObject zuck = facebookClient23.fetchObject("4", JsonObject.class);
-    out.println(zuck.getString("name"));
+    out.println(zuck.get("name").toString());
 
     JsonObject photosConnection = facebookClient23.fetchObject("me/photos", JsonObject.class);
     JsonArray photosConnectionData = photosConnection.getJsonArray("data");
