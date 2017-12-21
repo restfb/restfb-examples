@@ -30,8 +30,6 @@ import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import java.util.Map;
-
 public class LoginJavaFXExample extends Application {
 
   private Scene scene;

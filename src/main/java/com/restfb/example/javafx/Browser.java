@@ -79,6 +79,7 @@ public class Browser extends Region {
           FacebookClient.AccessToken token = facebookClient.obtainUserAccessToken(appId,
                   appSecret, SUCCESS_URL, code);
           System.out.println("Accesstoken: " + token.getAccessToken());
+          System.out.println("Expires: " + token.getExpires());
         }
 
       });
