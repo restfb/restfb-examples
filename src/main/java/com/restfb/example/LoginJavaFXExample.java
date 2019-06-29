@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2018 Mark Allen, Norbert Bartels.
@@ -23,28 +23,70 @@
  */
 package com.restfb.example;
 
-import com.restfb.example.javafx.Browser;
-
+import com.restfb.DefaultFacebookClient;
+import com.restfb.FacebookClient.AccessToken;
+import com.restfb.Version;
+import com.restfb.scope.ScopeBuilder;
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+
+import static com.restfb.logging.RestFBLogger.CLIENT_LOGGER;
 
 public class LoginJavaFXExample extends Application {
 
-  private Scene scene;
+  private static final String SUCCESS_URL = "https://www.facebook.com/connect/login_success.html";
 
-  public void start(Stage primaryStage) throws Exception {
+  private String appId;
+  private String appSecret;
+
+  public void start(Stage stage) {
+    // parse arguments
+    appId = getParameters().getRaw().get(0);
+    appSecret = getParameters().getRaw().get(1);
+
+    WebView webView = new WebView();
+    WebEngine webEngine = webView.getEngine();
 
     // create the scene
-    primaryStage.setTitle("Facebook Login Example");
-    String appId = getParameters().getRaw().get(0);
-    String appSecret = getParameters().getRaw().get(1);
-    Browser facebookBrowser = new Browser(appId, appSecret);
-    scene = new Scene(facebookBrowser, 900, 600, Color.web("#666970"));
-    primaryStage.setScene(scene);
-    primaryStage.show();
-    facebookBrowser.showLogin();
+    stage.setTitle("Facebook Login Example");
+    // use quite a wide window to handle cookies popup nicely
+    stage.setScene(new Scene(new VBox(webView), 1000, 600, Color.web("#666970")));
+    stage.show();
+
+    // obtain Facebook access token by loading login page
+    DefaultFacebookClient facebookClient = new DefaultFacebookClient(Version.LATEST);
+    String loginDialogUrl = facebookClient.getLoginDialogUrl(appId, SUCCESS_URL, new ScopeBuilder());
+    webEngine.load(loginDialogUrl + "&display=popup&response_type=code");
+    webEngine.locationProperty().addListener((property, oldValue, newValue) -> {
+          if (newValue.startsWith(SUCCESS_URL)) {
+            // extract access token
+            CLIENT_LOGGER.debug(newValue);
+            int codeOffset = newValue.indexOf("code=");
+            String code = newValue.substring(codeOffset + "code=".length());
+            AccessToken accessToken = facebookClient.obtainUserAccessToken(
+                appId, appSecret, SUCCESS_URL, code);
+
+            // trigger further code's execution
+            consumeAccessToken(accessToken);
+
+            // close the app as goal was reached
+            stage.close();
+
+          } else if ("https://www.facebook.com/dialog/close".equals(newValue)) {
+            throw new IllegalStateException("dialog closed");
+          }
+        }
+    );
+  }
+
+  private static void consumeAccessToken(AccessToken accessToken) {
+    CLIENT_LOGGER.debug("Access token: " + accessToken.getAccessToken());
+    CLIENT_LOGGER.debug("Expires: " + accessToken.getExpires());
   }
 
   public static void main(String[] args) {
