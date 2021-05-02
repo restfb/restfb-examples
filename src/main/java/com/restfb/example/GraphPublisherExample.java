@@ -27,10 +27,7 @@ import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.System.out;
 
-import com.restfb.BinaryAttachment;
-import com.restfb.DefaultFacebookClient;
-import com.restfb.FacebookClient;
-import com.restfb.Parameter;
+import com.restfb.*;
 import com.restfb.types.FacebookType;
 
 import java.util.Date;
@@ -65,7 +62,7 @@ public class GraphPublisherExample extends Example {
   }
 
   GraphPublisherExample(String accessToken) {
-    facebookClient = new DefaultFacebookClient(accessToken);
+    facebookClient = new DefaultFacebookClient(accessToken, Version.VERSION_10_0);
   }
 
   void runEverything() {

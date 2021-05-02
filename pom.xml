@@ -66,7 +66,7 @@
     <dependency>
       <groupId>com.restfb</groupId>
       <artifactId>restfb</artifactId>
-      <version>2.0.0</version>
+      <version>3.16.0</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -138,6 +138,18 @@
             </goals>
             <configuration>
               <mainClass>com.restfb.example.GraphReaderExample</mainClass>
+              <arguments>
+                <argument>${access_token}</argument>
+              </arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>run-device-examples</id>
+            <goals>
+              <goal>java</goal>
+            </goals>
+            <configuration>
+              <mainClass>com.restfb.example.LoginDeviceAccessExample</mainClass>
               <arguments>
                 <argument>${access_token}</argument>
               </arguments>

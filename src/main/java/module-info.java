@@ -8,6 +8,8 @@ module com.restfb.example {
   requires jul.to.slf4j;
   // other modules
   requires restfb;
+  requires java.desktop;
+  requires logback.classic;
 
   exports com.restfb.example;
 }
